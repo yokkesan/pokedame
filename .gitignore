@@ -1,0 +1,11 @@
+.env
+.DS_Store
+
+src/node_modules/
+src/dist/
+
+api/app
+api/logs/
+api/tmp/
+
+*.log
