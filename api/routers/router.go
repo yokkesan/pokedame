@@ -9,4 +9,10 @@ import (
 func init() {
 	beego.Router("/", &controllers.MainController{})
 	beego.Router("/api/health", &controllers.HealthController{}, "get:Get")
+
+	beego.Router(
+		"/api/admin/pokemon-species",
+		&controllers.PokemonSpeciesController{},
+		"get:List;post:Create",
+	)
 }
