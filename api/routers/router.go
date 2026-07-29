@@ -15,4 +15,28 @@ func init() {
 		&controllers.PokemonSpeciesController{},
 		"get:List;post:Create",
 	)
+
+	beego.Router(
+		"/api/admin/pokemon-species/:speciesId/forms",
+		&controllers.PokemonFormController{},
+		"get:List;post:Create",
+	)
+
+	beego.Router(
+		"/api/admin/pokemon-forms/:formId/assets",
+		&controllers.PokemonAssetController{},
+		"get:List;post:Create",
+	)
+
+	beego.Router(
+		"/api/admin/pokemon-assets/:assetId",
+		&controllers.PokemonAssetController{},
+		"delete:Delete",
+	)
+
+	beego.Router(
+		"/admin/pokemon",
+		&controllers.AdminPokemonController{},
+		"get:Index",
+	)
 }

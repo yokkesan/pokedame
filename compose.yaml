@@ -23,6 +23,7 @@ services:
       - "8080:8080"
     volumes:
       - ./api:/app
+      - pokemon_asset_storage:/app/storage
     environment:
       APP_ENV: local
       DB_HOST: db
@@ -30,6 +31,7 @@ services:
       DB_NAME: ${POSTGRES_DB}
       DB_USER: ${POSTGRES_USER}
       DB_PASSWORD: ${POSTGRES_PASSWORD}
+      POKEMON_ASSET_STORAGE_DIR: /app/storage
     depends_on:
       db:
         condition: service_healthy
@@ -58,3 +60,4 @@ services:
 volumes:
   frontend_node_modules:
   postgres_data:
+  pokemon_asset_storage:
