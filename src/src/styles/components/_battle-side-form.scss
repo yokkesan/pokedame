@@ -1,0 +1,52 @@
+@use '../foundation/variables' as variables;
+
+.battle-side-form {
+    display: grid;
+    gap: 16px;
+
+    &__field {
+        display: grid;
+        gap: 6px;
+    }
+
+    &__label {
+        color: variables.$color-heading;
+        font-size: 14px;
+        font-weight: 700;
+    }
+
+    &__control {
+        width: 100%;
+        min-height: 42px;
+        padding: 8px 12px;
+        border: 1px solid variables.$color-border;
+        border-radius: 6px;
+        color: variables.$color-text;
+        background: variables.$color-surface;
+
+        &:focus {
+            border-color: #64748b;
+            outline: 2px solid rgb(100 116 139 / 20%);
+            outline-offset: 1px;
+        }
+
+        &:disabled {
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+    }
+
+    &__stats {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+    }
+}
+
+@media (max-width: variables.$breakpoint-tablet) {
+    .battle-side-form {
+        &__stats {
+            grid-template-columns: 1fr;
+        }
+    }
+}

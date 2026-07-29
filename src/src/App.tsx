@@ -1,71 +1,72 @@
-import {
-  useEffect,
-  useState,
-} from 'react'
+import { useState } from 'react'
 
-import './App.css'
-
-type ApiStatus = 'loading' | 'connected' | 'failed'
-
-type HealthResponse = {
-  status: string
-}
+import { BattleSideForm } from './components/battle/BattleSideForm'
+import { FieldSettings } from './components/battle/FieldSettings'
 
 function App() {
-  const [apiStatus, setApiStatus] = useState<ApiStatus>('loading')
-
-  useEffect(() => {
-    const controller = new AbortController()
-
-    const checkApiConnection = async () => {
-      try {
-        const response = await fetch('/api/health', {
-          method: 'GET',
-          headers: {
-            Accept: 'application/json',
-          },
-          signal: controller.signal,
-        })
-
-        if (!response.ok) {
-          throw new Error(`API responded with ${response.status}`)
-        }
-
-        const data = (await response.json()) as HealthResponse
-
-        if (data.status !== 'ok') {
-          throw new Error('Unexpected health response')
-        }
-
-        setApiStatus('connected')
-      } catch (error) {
-        if (error instanceof DOMException && error.name === 'AbortError') {
-          return
-        }
-
-        console.error('API connection failed:', error)
-        setApiStatus('failed')
-      }
-    }
-
-    void checkApiConnection()
-
-    return () => {
-      controller.abort()
-    }
-  }, [])
+  const [weather, setWeather] = useState('none')
+  const [field, setField] = useState('none')
 
   return (
-    <main className="app">
-      <section className="connection-panel">
-        <h1>pokedame</h1>
+    <main className="damage-calculator">
+      <header className="damage-calculator__header">
+        <h1 className="damage-calculator__title">pokedame</h1>
+      </header>
 
-        <p className={`connection-status connection-status--${apiStatus}`}>
-          {apiStatus === 'loading' && 'API接続を確認しています'}
-          {apiStatus === 'connected' && 'API接続：正常'}
-          {apiStatus === 'failed' && 'API接続：失敗'}
-        </p>
+      <section
+        className="battle-stage"
+        aria-labelledby="battle-stage-title"
+      >
+        <h2
+          id="battle-stage-title"
+          className="section-heading"
+        >
+          バトルアニメーション
+        </h2>
+
+        <div className="battle-stage__canvas">
+          <div className="battle-stage__pokemon battle-stage__pokemon--attacker">
+            攻撃側ポケモン
+          </div>
+
+          <div className="battle-stage__pokemon battle-stage__pokemon--defender">
+            受け側ポケモン
+          </div>
+        </div>
       </section>
+
+      <section
+        className="damage-result"
+        aria-labelledby="damage-result-title"
+      >
+        <h2
+          id="damage-result-title"
+          className="section-heading"
+        >
+          ダメージ計算結果
+        </h2>
+
+        <div className="damage-result__body">
+          <p className="damage-result__message">
+            計算結果がここに表示されます。
+          </p>
+        </div>
+      </section>
+
+      <section
+        className="battle-settings"
+        aria-label="攻撃側と受け側の設定"
+      >
+        <BattleSideForm side="attacker" />
+        <BattleSideForm side="defender" />
+      </section>
+
+      <FieldSettings
+        weather={weather}
+        field={field}
+        onWeatherChange={setWeather}
+        onFieldChange={setField}
+      />
     </main>
   )
 }
