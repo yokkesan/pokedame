@@ -10,6 +10,7 @@ COPY go.sum* ./
 RUN go mod download
 
 RUN go install github.com/beego/bee/v2@v2.3.0
+RUN go install github.com/pressly/goose/v3/cmd/goose@v3.26.0
 
 COPY . .
 
