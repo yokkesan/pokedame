@@ -1,0 +1,57 @@
+@use '../foundation/variables' as variables;
+
+.battle-stage {
+  overflow: hidden;
+  margin-bottom: 20px;
+  border: 1px solid variables.$color-border;
+  border-radius: 8px;
+  background: variables.$color-surface;
+
+  &__canvas {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    min-height: 320px;
+    background:
+      linear-gradient(
+        to bottom,
+        #bfdbfe 0%,
+        #dbeafe 58%,
+        #bbf7d0 58%,
+        #86efac 100%
+      );
+  }
+
+  &__pokemon {
+    display: flex;
+    align-items: flex-end;
+    min-width: 0;
+    padding: 32px;
+    font-weight: 700;
+
+    &--attacker {
+      justify-content: flex-start;
+    }
+
+    &--defender {
+      justify-content: flex-end;
+    }
+  }
+}
+
+@media (max-width: variables.$breakpoint-tablet) {
+  .battle-stage {
+    &__canvas {
+      grid-template-columns: 1fr;
+      min-height: 400px;
+    }
+
+    &__pokemon {
+      min-height: 200px;
+      padding: 20px;
+
+      &--defender {
+        align-items: flex-start;
+      }
+    }
+  }
+}

@@ -1,0 +1,18 @@
+@use '../foundation/variables' as variables;
+
+.damage-result {
+  overflow: hidden;
+  margin-bottom: 20px;
+  border: 1px solid variables.$color-border;
+  border-radius: 8px;
+  background: variables.$color-surface;
+
+  &__body {
+    min-height: 96px;
+    padding: 20px;
+  }
+
+  &__message {
+    color: variables.$color-text;
+  }
+}
