@@ -1,0 +1,167 @@
+@layer base {
+    :root {
+        color-scheme: dark;
+    }
+
+    body {
+        @apply m-0 bg-gray-900 text-gray-50;
+        font-family:
+            Inter,
+            "Hiragino Kaku Gothic ProN",
+            "Yu Gothic",
+            sans-serif;
+    }
+
+    button,
+    input,
+    select {
+        font: inherit;
+    }
+
+    button {
+        @apply cursor-pointer;
+    }
+}
+
+@layer components {
+    .admin-layout {
+        @apply mx-auto w-[min(1200px,calc(100%-32px))] py-8 pb-16;
+    }
+
+    .admin-header {
+        @apply mb-6;
+    }
+
+    .admin-header__title {
+        @apply m-0 text-[28px] font-bold;
+    }
+
+    .admin-header__description {
+        @apply mt-2 text-gray-400;
+    }
+
+    .admin-message {
+        @apply mb-5 hidden rounded-lg px-4 py-3;
+    }
+
+    .admin-message--visible {
+        @apply block;
+    }
+
+    .admin-message--success {
+        @apply bg-emerald-900 text-emerald-100;
+    }
+
+    .admin-message--error {
+        @apply bg-red-900 text-red-100;
+    }
+
+    .admin-grid {
+        @apply grid grid-cols-[minmax(260px,0.8fr)_minmax(0,1.7fr)] gap-5 max-[800px]:grid-cols-1;
+    }
+
+    .admin-panel {
+        @apply rounded-xl border border-gray-700 bg-gray-800 p-5;
+    }
+
+    .admin-panel__title {
+        @apply mb-4 text-xl font-bold;
+    }
+
+    .species-list {
+        @apply grid gap-2;
+    }
+
+    .species-button {
+        @apply w-full rounded-lg border border-gray-600 bg-gray-900 p-3 text-left text-gray-50 hover:border-blue-400;
+    }
+
+    .species-button--selected {
+        @apply border-blue-500 bg-blue-900;
+    }
+
+    .species-button__name {
+        @apply block font-bold;
+    }
+
+    .species-button__meta {
+        @apply mt-1 block text-[13px] text-gray-400;
+    }
+
+    .section {
+        @apply mt-7;
+    }
+
+    .section:first-child {
+        @apply mt-0;
+    }
+
+    .section__header {
+        @apply mb-3 flex items-center justify-between gap-4;
+    }
+
+    .section__title {
+        @apply text-lg font-bold;
+    }
+
+    .form-grid {
+        @apply grid grid-cols-2 gap-3 max-[800px]:grid-cols-1;
+    }
+
+    .form-field {
+        @apply grid gap-1.5;
+    }
+
+    .form-field--full {
+        @apply col-span-full max-[800px]:col-auto;
+    }
+
+    .form-field__label {
+        @apply text-sm text-gray-300;
+    }
+
+    .form-field__input {
+        @apply w-full rounded-lg border border-gray-600 bg-gray-900 px-3 py-2.5 text-gray-50 outline-none focus:border-blue-400;
+    }
+
+    .checkbox-field {
+        @apply flex items-center gap-2;
+    }
+
+    .button {
+        @apply rounded-lg border-0 px-4 py-2.5 font-bold disabled:cursor-not-allowed disabled:opacity-50;
+    }
+
+    .button--primary {
+        @apply bg-blue-600 text-white hover:bg-blue-500;
+    }
+
+    .button--danger {
+        @apply bg-red-700 text-white hover:bg-red-600;
+    }
+
+    .table-wrapper {
+        @apply overflow-x-auto;
+    }
+
+    .data-table {
+        @apply w-full border-collapse;
+    }
+
+    .data-table th,
+    .data-table td {
+        @apply whitespace-nowrap border-b border-gray-700 p-2.5 text-left;
+    }
+
+    .data-table th {
+        @apply text-[13px] text-gray-400;
+    }
+
+    .empty-message {
+        @apply m-0 py-5 text-center text-gray-400;
+    }
+
+    .preview-image {
+        @apply h-[72px] w-[72px] rounded-lg bg-gray-900 object-contain;
+    }
+}

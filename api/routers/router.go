@@ -7,6 +7,11 @@ import (
 )
 
 func init() {
+	beego.SetStaticPath(
+		"/pokemon-assets",
+		"/app/storage/pokemon-assets",
+	)
+
 	beego.Router("/", &controllers.MainController{})
 	beego.Router("/api/health", &controllers.HealthController{}, "get:Get")
 
@@ -38,5 +43,11 @@ func init() {
 		"/admin/pokemon",
 		&controllers.AdminPokemonController{},
 		"get:Index",
+	)
+
+	beego.Router(
+		"/admin/pokemon/:id",
+		&controllers.AdminPokemonController{},
+		"get:Detail",
 	)
 }

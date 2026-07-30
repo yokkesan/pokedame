@@ -10,6 +10,8 @@ import (
 	"time"
 
 	"github.com/jackc/pgx/v5/pgconn"
+
+	"api-generated/database"
 )
 
 const (
@@ -60,6 +62,7 @@ func CreatePokemonSpecies(
 	}
 
 	isActive := true
+
 	if request.IsActive != nil {
 		isActive = *request.IsActive
 	}
@@ -104,13 +107,19 @@ func CreatePokemonSpecies(
 		&pokemon.CreatedAt,
 		&pokemon.UpdatedAt,
 	)
+
 	if err != nil {
 		var pgError *pgconn.PgError
-		if errors.As(err, &pgError) && pgError.Code == "23505" {
+
+		if errors.As(err, &pgError) &&
+			pgError.Code == "23505" {
 			return nil, ErrDuplicatePokemonSpecies
 		}
 
-		return nil, fmt.Errorf("create pokemon species: %w", err)
+		return nil, fmt.Errorf(
+			"create pokemon species: %w",
+			err,
+		)
 	}
 
 	return &pokemon, nil
@@ -135,9 +144,14 @@ func FindAllPokemonSpecies(
 	`
 
 	rows, err := db.QueryContext(ctx, query)
+
 	if err != nil {
-		return nil, fmt.Errorf("find pokemon species: %w", err)
+		return nil, fmt.Errorf(
+			"find pokemon species: %w",
+			err,
+		)
 	}
+
 	defer rows.Close()
 
 	pokemonList := make([]PokemonSpecies, 0)
@@ -155,17 +169,88 @@ func FindAllPokemonSpecies(
 			&pokemon.CreatedAt,
 			&pokemon.UpdatedAt,
 		); err != nil {
-			return nil, fmt.Errorf("scan pokemon species: %w", err)
+			return nil, fmt.Errorf(
+				"scan pokemon species: %w",
+				err,
+			)
 		}
 
-		pokemonList = append(pokemonList, pokemon)
+		pokemonList = append(
+			pokemonList,
+			pokemon,
+		)
 	}
 
 	if err := rows.Err(); err != nil {
-		return nil, fmt.Errorf("iterate pokemon species: %w", err)
+		return nil, fmt.Errorf(
+			"iterate pokemon species: %w",
+			err,
+		)
 	}
 
 	return pokemonList, nil
+}
+
+func FindPokemonSpeciesByID(
+	ctx context.Context,
+	id int64,
+) (*PokemonSpecies, error) {
+	if id <= 0 {
+		return nil, ErrInvalidPokemonSpeciesID
+	}
+
+	db, err := database.Get()
+
+	if err != nil {
+		return nil, fmt.Errorf(
+			"get database connection: %w",
+			err,
+		)
+	}
+
+	const query = `
+		SELECT
+			id,
+			national_dex_number,
+			name_ja,
+			name_en,
+			slug,
+			is_active,
+			created_at,
+			updated_at
+		FROM pokemon_species
+		WHERE id = $1
+	`
+
+	var species PokemonSpecies
+
+	err = db.QueryRowContext(
+		ctx,
+		query,
+		id,
+	).Scan(
+		&species.ID,
+		&species.NationalDexNumber,
+		&species.NameJA,
+		&species.NameEN,
+		&species.Slug,
+		&species.IsActive,
+		&species.CreatedAt,
+		&species.UpdatedAt,
+	)
+
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, ErrPokemonSpeciesNotFound
+	}
+
+	if err != nil {
+		return nil, fmt.Errorf(
+			"find pokemon species by id: %w",
+			err,
+		)
+	}
+
+	return &species, nil
 }
 
 func validateCreatePokemonSpeciesRequest(

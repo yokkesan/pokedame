@@ -9,3 +9,4 @@ api/logs/
 api/tmp/
 
 *.log
+node_modules/
