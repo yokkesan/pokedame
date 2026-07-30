@@ -1,0 +1,20 @@
+{
+  "name": "api",
+  "version": "1.0.0",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+  "css:build": "tailwindcss -i ./assets/css/main.css -o ./static/css/main.css --minify",
+  "css:watch": "tailwindcss -i ./assets/css/main.css -o ./static/css/main.css --watch=always"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.3.3",
+    "tailwindcss": "^4.3.3"
+  }
+}
