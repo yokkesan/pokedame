@@ -2,57 +2,143 @@ package controllers
 
 import (
 	"context"
-	"net/http"
+	"errors"
+	"strconv"
 	"time"
+
+	beego "github.com/beego/beego/v2/server/web"
 
 	"api-generated/database"
 	"api-generated/models"
-
-	beego "github.com/beego/beego/v2/server/web"
 )
-
-const adminPokemonRequestTimeout = 5 * time.Second
 
 type AdminPokemonController struct {
 	beego.Controller
 }
 
-type adminPokemonViewData struct {
+type AdminPokemonIndexViewData struct {
 	PokemonSpecies []models.PokemonSpecies
 	ErrorMessage   string
 }
 
+type AdminPokemonDetailViewData struct {
+	PokemonSpecies *models.PokemonSpecies
+	PokemonForms   []models.PokemonForm
+	PokemonAssets  []models.PokemonAsset
+	ErrorMessage   string
+}
+
 func (c *AdminPokemonController) Index() {
+	ctx, cancel := context.WithTimeout(
+		c.Ctx.Request.Context(),
+		5*time.Second,
+	)
+	defer cancel()
+
 	db, err := database.Get()
 	if err != nil {
-		c.Ctx.Output.SetStatus(http.StatusInternalServerError)
-		c.Data["ViewData"] = adminPokemonViewData{
-			PokemonSpecies: []models.PokemonSpecies{},
+		c.Data["ViewData"] = AdminPokemonIndexViewData{
+			PokemonSpecies: make([]models.PokemonSpecies, 0),
 			ErrorMessage:   "データベースへ接続できませんでした。",
 		}
 		c.TplName = "admin/pokemon.tpl"
 		return
 	}
 
-	ctx, cancel := context.WithTimeout(
-		c.Ctx.Request.Context(),
-		adminPokemonRequestTimeout,
+	species, err := models.FindAllPokemonSpecies(
+		ctx,
+		db,
 	)
-	defer cancel()
 
-	pokemonSpecies, err := models.FindAllPokemonSpecies(ctx, db)
+	viewData := AdminPokemonIndexViewData{
+		PokemonSpecies: species,
+	}
+
 	if err != nil {
-		c.Ctx.Output.SetStatus(http.StatusInternalServerError)
-		c.Data["ViewData"] = adminPokemonViewData{
-			PokemonSpecies: []models.PokemonSpecies{},
-			ErrorMessage:   "ポケモン一覧を取得できませんでした。",
-		}
-		c.TplName = "admin/pokemon.tpl"
+		viewData.PokemonSpecies =
+			make([]models.PokemonSpecies, 0)
+
+		viewData.ErrorMessage =
+			"ポケモン種族の一覧を取得できませんでした。"
+	}
+
+	c.Data["ViewData"] = viewData
+	c.TplName = "admin/pokemon.tpl"
+}
+
+func (c *AdminPokemonController) Detail() {
+	speciesID, err := strconv.ParseInt(
+		c.Ctx.Input.Param(":id"),
+		10,
+		64,
+	)
+
+	if err != nil || speciesID <= 0 {
+		c.Abort("404")
 		return
 	}
 
-	c.Data["ViewData"] = adminPokemonViewData{
-		PokemonSpecies: pokemonSpecies,
+	ctx, cancel := context.WithTimeout(
+		c.Ctx.Request.Context(),
+		5*time.Second,
+	)
+	defer cancel()
+
+	species, err := models.FindPokemonSpeciesByID(
+		ctx,
+		speciesID,
+	)
+
+	if errors.Is(
+		err,
+		models.ErrPokemonSpeciesNotFound,
+	) {
+		c.Abort("404")
+		return
 	}
-	c.TplName = "admin/pokemon.tpl"
+
+	if err != nil {
+		c.Data["ViewData"] = AdminPokemonDetailViewData{
+			PokemonForms:  make([]models.PokemonForm, 0),
+			PokemonAssets: nil,
+			ErrorMessage:  "ポケモン種族の詳細を取得できませんでした。",
+		}
+		c.TplName = "admin/pokemon_detail.tpl"
+		return
+	}
+
+	db, err := database.Get()
+	if err != nil {
+		c.Data["ViewData"] = AdminPokemonDetailViewData{
+			PokemonSpecies: species,
+			PokemonForms:   make([]models.PokemonForm, 0),
+			PokemonAssets:  nil,
+			ErrorMessage:   "データベースへ接続できませんでした。",
+		}
+		c.TplName = "admin/pokemon_detail.tpl"
+		return
+	}
+
+	forms, err := models.FindPokemonFormsBySpeciesID(
+		ctx,
+		db,
+		speciesID,
+	)
+
+	viewData := AdminPokemonDetailViewData{
+		PokemonSpecies: species,
+		PokemonForms:   forms,
+		PokemonAssets:  nil,
+	}
+
+	if err != nil {
+		viewData.PokemonForms =
+			make([]models.PokemonForm, 0)
+
+		viewData.ErrorMessage =
+			"フォーム一覧を取得できませんでした。"
+	}
+
+	c.Data["ViewData"] = viewData
+	c.TplName = "admin/pokemon_detail.tpl"
 }

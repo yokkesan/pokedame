@@ -3,3 +3,4 @@
 @source "../../views/**/*.tpl";
 
 @import "./admin/pokemon.css";
+@import "./admin/pokemon_detail.css";

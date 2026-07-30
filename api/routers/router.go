@@ -39,4 +39,10 @@ func init() {
 		&controllers.AdminPokemonController{},
 		"get:Index",
 	)
+
+	beego.Router(
+		"/admin/pokemon/:id",
+		&controllers.AdminPokemonController{},
+		"get:Detail",
+	)
 }

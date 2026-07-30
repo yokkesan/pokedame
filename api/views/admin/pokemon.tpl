@@ -6,6 +6,7 @@
         name="viewport"
         content="width=device-width, initial-scale=1.0"
     >
+
     <title>ポケモン管理 | pokedame</title>
 
     <link rel="stylesheet" href="/static/css/main.css">
@@ -14,9 +15,12 @@
 <body>
 <main class="admin-layout">
     <header class="admin-header">
-        <h1 class="admin-header__title">ポケモン管理</h1>
+        <h1 class="admin-header__title">
+            ポケモン管理
+        </h1>
+
         <p class="admin-header__description">
-            種族ごとのフォームと画像・アニメーション素材を管理します。
+            ポケモン種族、フォーム、素材を登録します。
         </p>
     </header>
 
@@ -34,15 +38,15 @@
 
     <div class="admin-grid">
         <section class="admin-panel">
-            <h2 class="admin-panel__title">ポケモン種族</h2>
+            <h2 class="admin-panel__title">
+                ポケモン種族
+            </h2>
 
             <div class="species-list">
                 {{range .ViewData.PokemonSpecies}}
-                    <button
-                        type="button"
+                    <a
                         class="species-button"
-                        data-species-id="{{.ID}}"
-                        data-species-name="{{.NameJA}}"
+                        href="/admin/pokemon/{{.ID}}"
                     >
                         <span class="species-button__name">
                             {{.NameJA}}
@@ -51,7 +55,7 @@
                         <span class="species-button__meta">
                             No.{{.NationalDexNumber}} / {{.Slug}}
                         </span>
-                    </button>
+                    </a>
                 {{else}}
                     <p class="empty-message">
                         ポケモン種族が登録されていません。
@@ -61,294 +65,389 @@
         </section>
 
         <section class="admin-panel">
-            <div class="section">
-                <div class="section__header">
-                    <h2
-                        id="selected-species-title"
-                        class="section__title"
-                    >
-                        フォーム管理
-                    </h2>
-                </div>
+            <h2 class="admin-panel__title">
+                ポケモン種族を登録
+            </h2>
 
-                <form id="pokemon-form-create-form">
-                    <div class="form-grid">
-                        <label class="form-field">
-                            <span class="form-field__label">
-                                フォームキー
-                            </span>
+            <form id="pokemon-species-create-form">
+                <div class="form-grid">
+                    <label class="form-field">
+                        <span class="form-field__label">
+                            全国図鑑番号
+                        </span>
 
-                            <input
-                                class="form-field__input"
-                                type="text"
-                                name="form_key"
-                                maxlength="100"
-                                placeholder="normal"
-                                required
-                            >
-                        </label>
+                        <input
+                            class="form-field__input"
+                            type="number"
+                            name="national_dex_number"
+                            min="1"
+                            required
+                        >
+                    </label>
 
-                        <label class="form-field">
-                            <span class="form-field__label">
-                                日本語名
-                            </span>
+                    <label class="form-field">
+                        <span class="form-field__label">
+                            日本語名
+                        </span>
 
-                            <input
-                                class="form-field__input"
-                                type="text"
-                                name="name_ja"
-                                maxlength="100"
-                                placeholder="通常"
-                            >
-                        </label>
+                        <input
+                            class="form-field__input"
+                            type="text"
+                            name="name_ja"
+                            maxlength="100"
+                            required
+                        >
+                    </label>
 
-                        <label class="form-field">
-                            <span class="form-field__label">
-                                英語名
-                            </span>
+                    <label class="form-field">
+                        <span class="form-field__label">
+                            英語名
+                        </span>
 
-                            <input
-                                class="form-field__input"
-                                type="text"
-                                name="name_en"
-                                maxlength="100"
-                                placeholder="Normal"
-                            >
-                        </label>
+                        <input
+                            class="form-field__input"
+                            type="text"
+                            name="name_en"
+                            maxlength="100"
+                        >
+                    </label>
 
-                        <div class="form-field">
-                            <span class="form-field__label">
-                                設定
-                            </span>
+                    <label class="form-field">
+                        <span class="form-field__label">
+                            slug
+                        </span>
 
-                            <label class="checkbox-field">
-                                <input
-                                    type="checkbox"
-                                    name="is_default"
-                                >
-                                デフォルトフォーム
-                            </label>
+                        <input
+                            class="form-field__input"
+                            type="text"
+                            name="slug"
+                            maxlength="100"
+                            placeholder="pikachu"
+                            required
+                        >
+                    </label>
 
-                            <label class="checkbox-field">
-                                <input
-                                    type="checkbox"
-                                    name="is_active"
-                                    checked
-                                >
-                                有効
-                            </label>
-                        </div>
+                    <label class="checkbox-field">
+                        <input
+                            type="checkbox"
+                            name="is_active"
+                            checked
+                        >
+                        有効
+                    </label>
 
-                        <div class="form-field form-field--full">
-                            <button
-                                id="create-form-button"
-                                class="button button--primary"
-                                type="submit"
-                                disabled
-                            >
-                                フォームを登録
-                            </button>
-                        </div>
+                    <div class="form-field form-field--full">
+                        <button
+                            id="create-species-button"
+                            class="button button--primary"
+                            type="submit"
+                        >
+                            ポケモン種族を登録
+                        </button>
                     </div>
-                </form>
-
-                <div class="table-wrapper">
-                    <table class="data-table">
-                        <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>フォームキー</th>
-                            <th>日本語名</th>
-                            <th>デフォルト</th>
-                            <th>状態</th>
-                            <th>素材</th>
-                        </tr>
-                        </thead>
-
-                        <tbody id="pokemon-form-list">
-                        <tr>
-                            <td colspan="6">
-                                <p class="empty-message">
-                                    左側からポケモン種族を選択してください。
-                                </p>
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
                 </div>
-            </div>
-
-            <div class="section">
-                <div class="section__header">
-                    <h2
-                        id="asset-section-title"
-                        class="section__title"
-                    >
-                        素材管理
-                    </h2>
-                </div>
-
-                <form id="pokemon-asset-upload-form">
-                    <div class="form-grid">
-                        <label class="form-field form-field--full">
-                            <span class="form-field__label">
-                                画像ファイル
-                            </span>
-
-                            <input
-                                class="form-field__input"
-                                type="file"
-                                name="file"
-                                accept="image/png,image/jpeg,image/gif"
-                                required
-                            >
-                        </label>
-
-                        <label class="form-field">
-                            <span class="form-field__label">
-                                素材種別
-                            </span>
-
-                            <select
-                                class="form-field__input"
-                                name="asset_type"
-                                required
-                            >
-                                <option value="image">image</option>
-                                <option value="idle">idle</option>
-                                <option value="enter">enter</option>
-                                <option value="physical_attack">
-                                    physical_attack
-                                </option>
-                                <option value="special_attack">
-                                    special_attack
-                                </option>
-                                <option value="damage">damage</option>
-                                <option value="faint">faint</option>
-                                <option value="victory">victory</option>
-                            </select>
-                        </label>
-
-                        <label class="form-field">
-                            <span class="form-field__label">
-                                フレーム数
-                            </span>
-
-                            <input
-                                class="form-field__input"
-                                type="number"
-                                name="frame_count"
-                                value="1"
-                                min="1"
-                                required
-                            >
-                        </label>
-
-                        <label class="checkbox-field">
-                            <input
-                                type="checkbox"
-                                name="is_loop"
-                            >
-                            ループ再生
-                        </label>
-
-                        <label class="checkbox-field">
-                            <input
-                                type="checkbox"
-                                name="is_active"
-                                checked
-                            >
-                            有効
-                        </label>
-
-                        <div class="form-field form-field--full">
-                            <button
-                                id="upload-asset-button"
-                                class="button button--primary"
-                                type="submit"
-                                disabled
-                            >
-                                素材をアップロード
-                            </button>
-                        </div>
-                    </div>
-                </form>
-
-                <div class="table-wrapper">
-                    <table class="data-table">
-                        <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>種別</th>
-                            <th>ファイル名</th>
-                            <th>サイズ</th>
-                            <th>画像サイズ</th>
-                            <th>操作</th>
-                        </tr>
-                        </thead>
-
-                        <tbody id="pokemon-asset-list">
-                        <tr>
-                            <td colspan="6">
-                                <p class="empty-message">
-                                    フォームを選択してください。
-                                </p>
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+            </form>
         </section>
     </div>
+
+    <section class="admin-panel section">
+        <h2 class="admin-panel__title">
+            フォームを登録
+        </h2>
+
+        <form id="pokemon-form-create-form">
+            <div class="form-grid">
+                <label class="form-field form-field--full">
+                    <span class="form-field__label">
+                        ポケモン種族
+                    </span>
+
+                    <select
+                        id="form-species-id"
+                        class="form-field__input"
+                        name="species_id"
+                        required
+                    >
+                        <option value="">
+                            選択してください
+                        </option>
+
+                        {{range .ViewData.PokemonSpecies}}
+                            <option value="{{.ID}}">
+                                No.{{.NationalDexNumber}} {{.NameJA}}
+                            </option>
+                        {{end}}
+                    </select>
+                </label>
+
+                <label class="form-field">
+                    <span class="form-field__label">
+                        フォームキー
+                    </span>
+
+                    <input
+                        class="form-field__input"
+                        type="text"
+                        name="form_key"
+                        maxlength="100"
+                        placeholder="normal"
+                        required
+                    >
+                </label>
+
+                <label class="form-field">
+                    <span class="form-field__label">
+                        日本語名
+                    </span>
+
+                    <input
+                        class="form-field__input"
+                        type="text"
+                        name="name_ja"
+                        maxlength="100"
+                        placeholder="通常"
+                    >
+                </label>
+
+                <label class="form-field">
+                    <span class="form-field__label">
+                        英語名
+                    </span>
+
+                    <input
+                        class="form-field__input"
+                        type="text"
+                        name="name_en"
+                        maxlength="100"
+                        placeholder="Normal"
+                    >
+                </label>
+
+                <div class="form-field">
+                    <span class="form-field__label">
+                        設定
+                    </span>
+
+                    <label class="checkbox-field">
+                        <input
+                            type="checkbox"
+                            name="is_default"
+                        >
+                        デフォルトフォーム
+                    </label>
+
+                    <label class="checkbox-field">
+                        <input
+                            type="checkbox"
+                            name="is_active"
+                            checked
+                        >
+                        有効
+                    </label>
+                </div>
+
+                <div class="form-field form-field--full">
+                    <button
+                        id="create-form-button"
+                        class="button button--primary"
+                        type="submit"
+                    >
+                        フォームを登録
+                    </button>
+                </div>
+            </div>
+        </form>
+    </section>
+
+    <section class="admin-panel section">
+        <h2 class="admin-panel__title">
+            素材を登録
+        </h2>
+
+        <form id="pokemon-asset-upload-form">
+            <div class="form-grid">
+                <label class="form-field">
+                    <span class="form-field__label">
+                        ポケモン種族
+                    </span>
+
+                    <select
+                        id="asset-species-id"
+                        class="form-field__input"
+                        required
+                    >
+                        <option value="">
+                            選択してください
+                        </option>
+
+                        {{range .ViewData.PokemonSpecies}}
+                            <option value="{{.ID}}">
+                                No.{{.NationalDexNumber}} {{.NameJA}}
+                            </option>
+                        {{end}}
+                    </select>
+                </label>
+
+                <label class="form-field">
+                    <span class="form-field__label">
+                        フォーム
+                    </span>
+
+                    <select
+                        id="asset-form-id"
+                        class="form-field__input"
+                        name="form_id"
+                        required
+                        disabled
+                    >
+                        <option value="">
+                            先にポケモン種族を選択してください
+                        </option>
+                    </select>
+                </label>
+
+                <label class="form-field form-field--full">
+                    <span class="form-field__label">
+                        画像ファイル
+                    </span>
+
+                    <input
+                        class="form-field__input"
+                        type="file"
+                        name="file"
+                        accept="image/png,image/jpeg,image/gif"
+                        required
+                    >
+                </label>
+
+                <label class="form-field">
+                    <span class="form-field__label">
+                        素材種別
+                    </span>
+
+                    <select
+                        class="form-field__input"
+                        name="asset_type"
+                        required
+                    >
+                        <option value="image">image</option>
+                        <option value="idle">idle</option>
+                        <option value="enter">enter</option>
+                        <option value="physical_attack">
+                            physical_attack
+                        </option>
+                        <option value="special_attack">
+                            special_attack
+                        </option>
+                        <option value="damage">damage</option>
+                        <option value="faint">faint</option>
+                        <option value="victory">victory</option>
+                    </select>
+                </label>
+
+                <label class="form-field">
+                    <span class="form-field__label">
+                        フレーム数
+                    </span>
+
+                    <input
+                        class="form-field__input"
+                        type="number"
+                        name="frame_count"
+                        value="1"
+                        min="1"
+                        required
+                    >
+                </label>
+
+                <label class="checkbox-field">
+                    <input
+                        type="checkbox"
+                        name="is_loop"
+                    >
+                    ループ再生
+                </label>
+
+                <label class="checkbox-field">
+                    <input
+                        type="checkbox"
+                        name="is_active"
+                        checked
+                    >
+                    有効
+                </label>
+
+                <div class="form-field form-field--full">
+                    <button
+                        id="upload-asset-button"
+                        class="button button--primary"
+                        type="submit"
+                        disabled
+                    >
+                        素材をアップロード
+                    </button>
+                </div>
+            </div>
+        </form>
+    </section>
 </main>
 
 <script>
     (() => {
         "use strict";
 
-        const state = {
-            speciesId: null,
-            formId: null,
-        };
-
         const messageElement =
             document.getElementById("admin-message");
 
-        const formCreateForm =
-            document.getElementById("pokemon-form-create-form");
+        const speciesCreateForm =
+            document.getElementById(
+                "pokemon-species-create-form",
+            );
+
+        const pokemonFormCreateForm =
+            document.getElementById(
+                "pokemon-form-create-form",
+            );
 
         const assetUploadForm =
-            document.getElementById("pokemon-asset-upload-form");
+            document.getElementById(
+                "pokemon-asset-upload-form",
+            );
 
-        const formListElement =
-            document.getElementById("pokemon-form-list");
-
-        const assetListElement =
-            document.getElementById("pokemon-asset-list");
+        const createSpeciesButton =
+            document.getElementById(
+                "create-species-button",
+            );
 
         const createFormButton =
-            document.getElementById("create-form-button");
+            document.getElementById(
+                "create-form-button",
+            );
 
         const uploadAssetButton =
-            document.getElementById("upload-asset-button");
+            document.getElementById(
+                "upload-asset-button",
+            );
 
-        const selectedSpeciesTitle =
-            document.getElementById("selected-species-title");
+        const assetSpeciesSelect =
+            document.getElementById(
+                "asset-species-id",
+            );
 
-        const assetSectionTitle =
-            document.getElementById("asset-section-title");
-
-        function escapeHTML(value) {
-            const element = document.createElement("div");
-            element.textContent = String(value ?? "");
-            return element.innerHTML;
-        }
+        const assetFormSelect =
+            document.getElementById(
+                "asset-form-id",
+            );
 
         function showMessage(message, type) {
             messageElement.textContent = message;
             messageElement.className =
                 `admin-message admin-message--visible admin-message--${type}`;
+
+            messageElement.scrollIntoView({
+                behavior: "smooth",
+                block: "center",
+            });
         }
 
         function clearMessage() {
@@ -366,296 +465,253 @@
             try {
                 return JSON.parse(text);
             } catch {
-                throw new Error("サーバーから不正な応答が返されました。");
-            }
-        }
-
-        async function loadForms() {
-            if (!state.speciesId) {
-                return;
-            }
-
-            const response = await fetch(
-                `/api/admin/pokemon-species/${state.speciesId}/forms`,
-                {
-                    method: "GET",
-                    headers: {
-                        "Accept": "application/json",
-                    },
-                },
-            );
-
-            const data = await readJSON(response);
-
-            if (!response.ok) {
                 throw new Error(
-                    data?.message ?? "フォーム一覧を取得できませんでした。",
+                    "サーバーから不正な応答が返されました。",
                 );
             }
-
-            renderForms(data);
         }
 
-        function renderForms(forms) {
-            state.formId = null;
-            uploadAssetButton.disabled = true;
-            assetSectionTitle.textContent = "素材管理";
+        speciesCreateForm.addEventListener(
+            "submit",
+            async (event) => {
+                event.preventDefault();
+                clearMessage();
 
-            assetListElement.innerHTML = `
-                <tr>
-                    <td colspan="6">
-                        <p class="empty-message">
-                            フォームを選択してください。
-                        </p>
-                    </td>
-                </tr>
-            `;
+                const formData =
+                    new FormData(speciesCreateForm);
 
-            if (!Array.isArray(forms) || forms.length === 0) {
-                formListElement.innerHTML = `
-                    <tr>
-                        <td colspan="6">
-                            <p class="empty-message">
-                                フォームが登録されていません。
-                            </p>
-                        </td>
-                    </tr>
-                `;
-                return;
-            }
+                const payload = {
+                    national_dex_number: Number(
+                        formData.get(
+                            "national_dex_number",
+                        ),
+                    ),
+                    name_ja: String(
+                        formData.get("name_ja") ?? "",
+                    ).trim(),
+                    name_en: String(
+                        formData.get("name_en") ?? "",
+                    ).trim(),
+                    slug: String(
+                        formData.get("slug") ?? "",
+                    ).trim(),
+                    is_active:
+                        formData.has("is_active"),
+                };
 
-            formListElement.innerHTML = forms.map((form) => `
-                <tr>
-                    <td>${form.id}</td>
-                    <td>${escapeHTML(form.form_key)}</td>
-                    <td>${escapeHTML(form.name_ja ?? "-")}</td>
-                    <td>${form.is_default ? "はい" : "いいえ"}</td>
-                    <td>${form.is_active ? "有効" : "無効"}</td>
-                    <td>
-                        <button
-                            type="button"
-                            class="button button--primary"
-                            data-action="select-form"
-                            data-form-id="${form.id}"
-                            data-form-name="${escapeHTML(
-                                form.name_ja ?? form.form_key,
-                            )}"
-                        >
-                            素材を管理
-                        </button>
-                    </td>
-                </tr>
-            `).join("");
-        }
+                createSpeciesButton.disabled = true;
 
-        async function loadAssets() {
-            if (!state.formId) {
-                return;
-            }
-
-            const response = await fetch(
-                `/api/admin/pokemon-forms/${state.formId}/assets`,
-                {
-                    method: "GET",
-                    headers: {
-                        "Accept": "application/json",
-                    },
-                },
-            );
-
-            const data = await readJSON(response);
-
-            if (!response.ok) {
-                throw new Error(
-                    data?.message ?? "素材一覧を取得できませんでした。",
-                );
-            }
-
-            renderAssets(data);
-        }
-
-        function renderAssets(assets) {
-            if (!Array.isArray(assets) || assets.length === 0) {
-                assetListElement.innerHTML = `
-                    <tr>
-                        <td colspan="6">
-                            <p class="empty-message">
-                                素材が登録されていません。
-                            </p>
-                        </td>
-                    </tr>
-                `;
-                return;
-            }
-
-            assetListElement.innerHTML = assets.map((asset) => `
-                <tr>
-                    <td>${asset.id}</td>
-                    <td>${escapeHTML(asset.asset_type)}</td>
-                    <td>${escapeHTML(asset.original_filename)}</td>
-                    <td>${formatFileSize(asset.file_size)}</td>
-                    <td>
-                        ${asset.width ?? "-"} × ${asset.height ?? "-"}
-                    </td>
-                    <td>
-                        <button
-                            type="button"
-                            class="button button--danger"
-                            data-action="delete-asset"
-                            data-asset-id="${asset.id}"
-                        >
-                            削除
-                        </button>
-                    </td>
-                </tr>
-            `).join("");
-        }
-
-        function formatFileSize(size) {
-            const bytes = Number(size);
-
-            if (!Number.isFinite(bytes) || bytes < 0) {
-                return "-";
-            }
-
-            if (bytes < 1024) {
-                return `${bytes} B`;
-            }
-
-            if (bytes < 1024 * 1024) {
-                return `${(bytes / 1024).toFixed(1)} KB`;
-            }
-
-            return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
-        }
-
-        document
-            .querySelectorAll(".species-button")
-            .forEach((button) => {
-                button.addEventListener("click", async () => {
-                    clearMessage();
-
-                    document
-                        .querySelectorAll(".species-button")
-                        .forEach((item) => {
-                            item.classList.remove(
-                                "species-button--selected",
-                            );
-                        });
-
-                    button.classList.add(
-                        "species-button--selected",
-                    );
-
-                    state.speciesId = Number(
-                        button.dataset.speciesId,
-                    );
-
-                    state.formId = null;
-                    createFormButton.disabled = false;
-                    uploadAssetButton.disabled = true;
-
-                    selectedSpeciesTitle.textContent =
-                        `${button.dataset.speciesName}のフォーム管理`;
-
-                    try {
-                        await loadForms();
-                    } catch (error) {
-                        showMessage(error.message, "error");
-                    }
-                });
-            });
-
-        formCreateForm.addEventListener("submit", async (event) => {
-            event.preventDefault();
-            clearMessage();
-
-            if (!state.speciesId) {
-                showMessage(
-                    "ポケモン種族を選択してください。",
-                    "error",
-                );
-                return;
-            }
-
-            const formData = new FormData(formCreateForm);
-
-            const payload = {
-                form_key: String(
-                    formData.get("form_key") ?? "",
-                ),
-                name_ja: String(
-                    formData.get("name_ja") ?? "",
-                ),
-                name_en: String(
-                    formData.get("name_en") ?? "",
-                ),
-                is_default: formData.has("is_default"),
-                is_active: formData.has("is_active"),
-            };
-
-            createFormButton.disabled = true;
-
-            try {
-                const response = await fetch(
-                    `/api/admin/pokemon-species/${state.speciesId}/forms`,
-                    {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                            "Accept": "application/json",
+                try {
+                    const response = await fetch(
+                        "/api/admin/pokemon-species",
+                        {
+                            method: "POST",
+                            headers: {
+                                "Content-Type":
+                                    "application/json",
+                                "Accept":
+                                    "application/json",
+                            },
+                            body: JSON.stringify(payload),
                         },
-                        body: JSON.stringify(payload),
-                    },
-                );
-
-                const data = await readJSON(response);
-
-                if (!response.ok) {
-                    throw new Error(
-                        data?.message ?? "フォームを登録できませんでした。",
                     );
+
+                    const data = await readJSON(response);
+
+                    if (!response.ok) {
+                        throw new Error(
+                            data?.message ??
+                            "ポケモン種族を登録できませんでした。",
+                        );
+                    }
+
+                    window.location.reload();
+                } catch (error) {
+                    showMessage(
+                        error.message,
+                        "error",
+                    );
+                } finally {
+                    createSpeciesButton.disabled = false;
+                }
+            },
+        );
+
+        pokemonFormCreateForm.addEventListener(
+            "submit",
+            async (event) => {
+                event.preventDefault();
+                clearMessage();
+
+                const formData =
+                    new FormData(pokemonFormCreateForm);
+
+                const speciesId =
+                    Number(formData.get("species_id"));
+
+                if (!speciesId) {
+                    showMessage(
+                        "ポケモン種族を選択してください。",
+                        "error",
+                    );
+                    return;
                 }
 
-                formCreateForm.reset();
-                formCreateForm.elements.is_active.checked = true;
+                const payload = {
+                    form_key: String(
+                        formData.get("form_key") ?? "",
+                    ).trim(),
+                    name_ja: String(
+                        formData.get("name_ja") ?? "",
+                    ).trim(),
+                    name_en: String(
+                        formData.get("name_en") ?? "",
+                    ).trim(),
+                    is_default:
+                        formData.has("is_default"),
+                    is_active:
+                        formData.has("is_active"),
+                };
 
-                await loadForms();
+                createFormButton.disabled = true;
 
-                showMessage(
-                    "フォームを登録しました。",
-                    "success",
-                );
-            } catch (error) {
-                showMessage(error.message, "error");
-            } finally {
-                createFormButton.disabled = false;
-            }
-        });
+                try {
+                    const response = await fetch(
+                        `/api/admin/pokemon-species/${speciesId}/forms`,
+                        {
+                            method: "POST",
+                            headers: {
+                                "Content-Type":
+                                    "application/json",
+                                "Accept":
+                                    "application/json",
+                            },
+                            body: JSON.stringify(payload),
+                        },
+                    );
 
-        formListElement.addEventListener("click", async (event) => {
-            const button = event.target.closest(
-                '[data-action="select-form"]',
-            );
+                    const data = await readJSON(response);
 
-            if (!button) {
-                return;
-            }
+                    if (!response.ok) {
+                        throw new Error(
+                            data?.message ??
+                            "フォームを登録できませんでした。",
+                        );
+                    }
 
-            clearMessage();
+                    pokemonFormCreateForm.reset();
 
-            state.formId = Number(button.dataset.formId);
-            uploadAssetButton.disabled = false;
+                    pokemonFormCreateForm.elements
+                        .is_active.checked = true;
 
-            assetSectionTitle.textContent =
-                `${button.dataset.formName}の素材管理`;
+                    showMessage(
+                        "フォームを登録しました。",
+                        "success",
+                    );
+                } catch (error) {
+                    showMessage(
+                        error.message,
+                        "error",
+                    );
+                } finally {
+                    createFormButton.disabled = false;
+                }
+            },
+        );
 
-            try {
-                await loadAssets();
-            } catch (error) {
-                showMessage(error.message, "error");
-            }
-        });
+        assetSpeciesSelect.addEventListener(
+            "change",
+            async () => {
+                clearMessage();
+
+                const speciesId =
+                    Number(assetSpeciesSelect.value);
+
+                assetFormSelect.disabled = true;
+                uploadAssetButton.disabled = true;
+
+                assetFormSelect.innerHTML = `
+                    <option value="">
+                        読み込み中です
+                    </option>
+                `;
+
+                if (!speciesId) {
+                    assetFormSelect.innerHTML = `
+                        <option value="">
+                            先にポケモン種族を選択してください
+                        </option>
+                    `;
+                    return;
+                }
+
+                try {
+                    const response = await fetch(
+                        `/api/admin/pokemon-species/${speciesId}/forms`,
+                        {
+                            method: "GET",
+                            headers: {
+                                "Accept":
+                                    "application/json",
+                            },
+                        },
+                    );
+
+                    const forms = await readJSON(response);
+
+                    if (!response.ok) {
+                        throw new Error(
+                            forms?.message ??
+                            "フォーム一覧を取得できませんでした。",
+                        );
+                    }
+
+                    if (
+                        !Array.isArray(forms) ||
+                        forms.length === 0
+                    ) {
+                        assetFormSelect.innerHTML = `
+                            <option value="">
+                                フォームが登録されていません
+                            </option>
+                        `;
+                        return;
+                    }
+
+                    assetFormSelect.innerHTML = `
+                        <option value="">
+                            選択してください
+                        </option>
+                        ${forms.map((form) => `
+                            <option value="${form.id}">
+                                ${form.name_ja || form.form_key}
+                            </option>
+                        `).join("")}
+                    `;
+
+                    assetFormSelect.disabled = false;
+                } catch (error) {
+                    assetFormSelect.innerHTML = `
+                        <option value="">
+                            取得に失敗しました
+                        </option>
+                    `;
+
+                    showMessage(
+                        error.message,
+                        "error",
+                    );
+                }
+            },
+        );
+
+        assetFormSelect.addEventListener(
+            "change",
+            () => {
+                uploadAssetButton.disabled =
+                    !assetFormSelect.value;
+            },
+        );
 
         assetUploadForm.addEventListener(
             "submit",
@@ -663,7 +719,10 @@
                 event.preventDefault();
                 clearMessage();
 
-                if (!state.formId) {
+                const formId =
+                    Number(assetFormSelect.value);
+
+                if (!formId) {
                     showMessage(
                         "フォームを選択してください。",
                         "error",
@@ -671,27 +730,35 @@
                     return;
                 }
 
-                const formData = new FormData(assetUploadForm);
+                const formData =
+                    new FormData(assetUploadForm);
+
+                formData.delete("form_id");
 
                 formData.set(
                     "is_loop",
-                    formData.has("is_loop") ? "true" : "false",
+                    formData.has("is_loop")
+                        ? "true"
+                        : "false",
                 );
 
                 formData.set(
                     "is_active",
-                    formData.has("is_active") ? "true" : "false",
+                    formData.has("is_active")
+                        ? "true"
+                        : "false",
                 );
 
                 uploadAssetButton.disabled = true;
 
                 try {
                     const response = await fetch(
-                        `/api/admin/pokemon-forms/${state.formId}/assets`,
+                        `/api/admin/pokemon-forms/${formId}/assets`,
                         {
                             method: "POST",
                             headers: {
-                                "Accept": "application/json",
+                                "Accept":
+                                    "application/json",
                             },
                             body: formData,
                         },
@@ -707,73 +774,36 @@
                     }
 
                     assetUploadForm.reset();
-                    assetUploadForm.elements.frame_count.value = "1";
-                    assetUploadForm.elements.is_active.checked = true;
 
-                    await loadAssets();
+                    assetUploadForm.elements
+                        .frame_count.value = "1";
+
+                    assetUploadForm.elements
+                        .is_active.checked = true;
+
+                    assetSpeciesSelect.value = "";
+                    assetFormSelect.disabled = true;
+
+                    assetFormSelect.innerHTML = `
+                        <option value="">
+                            先にポケモン種族を選択してください
+                        </option>
+                    `;
 
                     showMessage(
-                        "素材をアップロードしました。",
+                        "素材を登録しました。",
                         "success",
                     );
                 } catch (error) {
-                    showMessage(error.message, "error");
-                } finally {
+                    showMessage(
+                        error.message,
+                        "error",
+                    );
+
                     uploadAssetButton.disabled = false;
                 }
             },
         );
-
-        assetListElement.addEventListener("click", async (event) => {
-            const button = event.target.closest(
-                '[data-action="delete-asset"]',
-            );
-
-            if (!button) {
-                return;
-            }
-
-            const confirmed = window.confirm(
-                "この素材を削除しますか？",
-            );
-
-            if (!confirmed) {
-                return;
-            }
-
-            clearMessage();
-            button.disabled = true;
-
-            try {
-                const response = await fetch(
-                    `/api/admin/pokemon-assets/${button.dataset.assetId}`,
-                    {
-                        method: "DELETE",
-                        headers: {
-                            "Accept": "application/json",
-                        },
-                    },
-                );
-
-                if (!response.ok) {
-                    const data = await readJSON(response);
-
-                    throw new Error(
-                        data?.message ?? "素材を削除できませんでした。",
-                    );
-                }
-
-                await loadAssets();
-
-                showMessage(
-                    "素材を削除しました。",
-                    "success",
-                );
-            } catch (error) {
-                showMessage(error.message, "error");
-                button.disabled = false;
-            }
-        });
     })();
 </script>
 </body>
