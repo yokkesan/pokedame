@@ -235,11 +235,11 @@
                             </dl>
 
                             {{if eq .AssetType "image"}}
-                                <img
-                                    class="asset-card__image"
-                                    src="{{.StoragePath}}"
-                                    alt="登録済みポケモン素材"
-                                >
+                            <img
+                            class="asset-card__image"
+                            src="/{{.StoragePath}}"
+                            alt="登録済みポケモン素材"
+                            >
                             {{end}}
                         </article>
                     {{end}}

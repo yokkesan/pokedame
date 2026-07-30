@@ -100,7 +100,7 @@ func (c *AdminPokemonController) Detail() {
 	if err != nil {
 		c.Data["ViewData"] = AdminPokemonDetailViewData{
 			PokemonForms:  make([]models.PokemonForm, 0),
-			PokemonAssets: nil,
+			PokemonAssets: make([]models.PokemonAsset, 0),
 			ErrorMessage:  "ポケモン種族の詳細を取得できませんでした。",
 		}
 		c.TplName = "admin/pokemon_detail.tpl"
@@ -112,7 +112,7 @@ func (c *AdminPokemonController) Detail() {
 		c.Data["ViewData"] = AdminPokemonDetailViewData{
 			PokemonSpecies: species,
 			PokemonForms:   make([]models.PokemonForm, 0),
-			PokemonAssets:  nil,
+			PokemonAssets:  make([]models.PokemonAsset, 0),
 			ErrorMessage:   "データベースへ接続できませんでした。",
 		}
 		c.TplName = "admin/pokemon_detail.tpl"
@@ -128,7 +128,7 @@ func (c *AdminPokemonController) Detail() {
 	viewData := AdminPokemonDetailViewData{
 		PokemonSpecies: species,
 		PokemonForms:   forms,
-		PokemonAssets:  nil,
+		PokemonAssets:  make([]models.PokemonAsset, 0),
 	}
 
 	if err != nil {
@@ -137,6 +137,29 @@ func (c *AdminPokemonController) Detail() {
 
 		viewData.ErrorMessage =
 			"フォーム一覧を取得できませんでした。"
+
+		c.Data["ViewData"] = viewData
+		c.TplName = "admin/pokemon_detail.tpl"
+		return
+	}
+
+	for _, form := range forms {
+		assets, err := models.FindPokemonAssetsByFormID(
+			ctx,
+			db,
+			form.ID,
+		)
+
+		if err != nil {
+			viewData.ErrorMessage =
+				"素材一覧を取得できませんでした。"
+			break
+		}
+
+		viewData.PokemonAssets = append(
+			viewData.PokemonAssets,
+			assets...,
+		)
 	}
 
 	c.Data["ViewData"] = viewData
